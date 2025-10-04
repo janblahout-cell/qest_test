@@ -31,11 +31,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           console.log("Saving user and tokens for:", email)
 
-          // Upsert user
+          // Upsert user with photo
           const dbUser = await prisma.users.upsert({
             where: { email: email },
-            update: {},
-            create: { email: email },
+            update: { photo_url: user.image },
+            create: { email: email, photo_url: user.image },
           })
 
           // Upsert oauth with calendar consent

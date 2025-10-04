@@ -28,6 +28,7 @@ export async function GET(
                   select: {
                     id: true,
                     email: true,
+                    photo_url: true,
                   },
                 },
               },
@@ -52,6 +53,7 @@ export async function GET(
               id: Number(seat.seat_reservations[0].id),
               user_id: Number(seat.seat_reservations[0].user_id),
               user_email: seat.seat_reservations[0].users.email,
+              user_photo: seat.seat_reservations[0].users.photo_url,
               date_of_reservation:
                 seat.seat_reservations[0].date_of_reservation.toISOString(),
             }

@@ -10,6 +10,7 @@ interface Seat {
     id: number
     user_id: number
     user_email: string
+    user_photo: string | null
     date_of_reservation: string
   } | null
 }
@@ -212,7 +213,7 @@ export default function RoomPage() {
                 key={seat.id}
                 onClick={() => handleSeatClick(seat)}
                 className={`
-                  p-6 rounded-lg border-2 transition-all hover:scale-105
+                  p-6 rounded-lg border-2 transition-all hover:scale-105 flex flex-col items-center
                   ${
                     !isReserved
                       ? "bg-green-100 border-green-300 hover:bg-green-200"
@@ -225,6 +226,15 @@ export default function RoomPage() {
                 <div className="text-lg font-semibold mb-2">
                   Seat {seat.id}
                 </div>
+
+                {isReserved && seat.reservation!.user_photo && (
+                  <img
+                    src={seat.reservation!.user_photo}
+                    alt={seat.reservation!.user_email}
+                    className="w-12 h-12 rounded-full mb-2 border-2 border-white shadow-sm"
+                  />
+                )}
+
                 <div className="text-sm">
                   {!isReserved ? (
                     <span className="text-green-700">Available</span>
