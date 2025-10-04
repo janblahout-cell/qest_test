@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 interface Seat {
   id: number
@@ -22,6 +23,7 @@ interface Room {
 export default function RoomPage() {
   const params = useParams()
   const roomId = params.id as string
+  const { data: session, status } = useSession()
   const [room, setRoom] = useState<Room | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState(
@@ -48,6 +50,8 @@ export default function RoomPage() {
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
+      if (!session?.user?.email) return
+
       try {
         const response = await fetch("/api/user/me")
         if (response.ok) {
@@ -59,8 +63,10 @@ export default function RoomPage() {
       }
     }
 
-    fetchCurrentUser()
-  }, [])
+    if (status === "authenticated") {
+      fetchCurrentUser()
+    }
+  }, [session, status])
 
   useEffect(() => {
     fetchRoom()
@@ -153,6 +159,33 @@ export default function RoomPage() {
     <div className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">{room.name}</h1>
+
+        {/* Login Status */}
+        <div className="mb-6">
+          {status === "loading" && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-center gap-2">
+              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+              <span className="text-sm text-yellow-800">Checking login status...</span>
+            </div>
+          )}
+          {status === "authenticated" && session?.user?.email && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm text-green-800">
+                Logged in as: <strong>{session.user.email}</strong>
+                {currentUserId && <span className="ml-2 text-green-600">(ID: {currentUserId})</span>}
+              </span>
+            </div>
+          )}
+          {status === "unauthenticated" && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span className="text-sm text-red-800">
+                Not logged in - <a href="/consent" className="underline font-medium">please sign in</a> to make reservations
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* Date selector */}
         <div className="mb-6">
