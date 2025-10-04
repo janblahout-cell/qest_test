@@ -50,6 +50,7 @@ export default function RoomPage() {
 
   useEffect(() => {
     fetchRoom()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, selectedDate])
 
   const handleSeatClick = async (seat: Seat) => {
@@ -89,7 +90,7 @@ export default function RoomPage() {
         const error = await response.json()
         alert(error.error || "Failed to reserve seat")
       }
-    } catch (error) {
+    } catch {
       alert("Error reserving seat")
     }
   }
@@ -108,7 +109,7 @@ export default function RoomPage() {
       } else {
         alert("Failed to delete reservation")
       }
-    } catch (error) {
+    } catch {
       alert("Error deleting reservation")
     }
   }
