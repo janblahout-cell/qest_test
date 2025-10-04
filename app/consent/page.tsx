@@ -1,12 +1,12 @@
-"use client"
+'use client';
 
-import { signIn } from "next-auth/react"
-import { Calendar } from "lucide-react"
+import { signIn } from 'next-auth/react';
+import { Calendar } from 'lucide-react';
 
 export default function ConsentPage() {
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/" })
-  }
+    signIn('google', { callbackUrl: '/' });
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
@@ -22,12 +22,13 @@ export default function ConsentPage() {
         </h1>
 
         <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
-          Connect your Google Calendar to allow our organization to manage calendar events on your behalf.
+          Connect your Google Calendar to allow our organization to manage
+          calendar events on your behalf.
         </p>
 
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
           <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
-            What we'll access:
+            What well access:
           </h3>
           <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
             <li>• View and create calendar events</li>
@@ -66,5 +67,5 @@ export default function ConsentPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }
