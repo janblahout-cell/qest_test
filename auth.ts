@@ -42,6 +42,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           await prisma.oauth.upsert({
             where: { user_id: dbUser.id },
             update: {
+              key: dbUser.id.toString(),
               googleAccessToken: account.access_token,
               googleRefreshToken: account.refresh_token,
               calendarConsent: true,
@@ -50,7 +51,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
             create: {
               user_id: dbUser.id,
-              key: account.access_token || "", // Use access_token as key
+              key: dbUser.id.toString(),
               googleAccessToken: account.access_token,
               googleRefreshToken: account.refresh_token,
               calendarConsent: true,
