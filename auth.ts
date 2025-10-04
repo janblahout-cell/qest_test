@@ -67,6 +67,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       return true
     },
+    async jwt({ token, user }) {
+      if (user?.email) {
+        token.email = user.email
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token?.email) {
+        session.user.email = token.email as string
+      }
+      return session
+    },
   },
   pages: {
     signIn: "/consent",

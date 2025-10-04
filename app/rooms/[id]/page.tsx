@@ -27,9 +27,7 @@ export default function RoomPage() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   )
-
-  // Hardcoded user ID for testing - replace with actual auth
-  const currentUserId = 1
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
 
   const fetchRoom = async () => {
     setLoading(true)
@@ -49,11 +47,32 @@ export default function RoomPage() {
   }
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await fetch("/api/user/me")
+        if (response.ok) {
+          const data = await response.json()
+          setCurrentUserId(data.id)
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error)
+      }
+    }
+
+    fetchCurrentUser()
+  }, [])
+
+  useEffect(() => {
     fetchRoom()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, selectedDate])
 
   const handleSeatClick = async (seat: Seat) => {
+    if (!currentUserId) {
+      alert("Please log in to make a reservation")
+      return
+    }
+
     if (seat.reservation) {
       // Seat is reserved
       if (seat.reservation.user_id === currentUserId) {
