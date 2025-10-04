@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Existing users table
+model users {
+  id    BigInt @id @default(autoincrement())
+  email String @unique @db.VarChar(255)
+  oauth oauth?
+}
+
+// OAuth table with calendar consent data
+model oauth {
+  user_id BigInt @id
+  key     String @unique @db.VarChar(255)
+
+  // Calendar consent fields
+  googleAccessToken  String?   @db.Text
+  googleRefreshToken String?   @db.Text
+  calendarConsent    Boolean   @default(false)
+  consentGrantedAt   DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  users users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_user_fkey")
+}
