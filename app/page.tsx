@@ -23,7 +23,7 @@ export default function Home() {
           </Link>
 
           <Link
-            href="/rooms/2"
+            href="/rooms"
             className="block p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow border-2 border-blue-100 hover:border-blue-300"
           >
             <h2 className="text-2xl font-semibold mb-3 text-blue-600">
