@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 interface Room {
   id: number
@@ -12,8 +14,12 @@ interface Room {
 }
 
 export default function RoomsPage() {
+  const router = useRouter()
+  const { data: session } = useSession()
   const [rooms, setRooms] = useState<Room[]>([])
   const [loading, setLoading] = useState(true)
+  const [randomLoading, setRandomLoading] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   )
@@ -34,9 +40,62 @@ export default function RoomsPage() {
   }
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      if (!session?.user?.email) return
+
+      try {
+        const response = await fetch("/api/user/me")
+        if (response.ok) {
+          const data = await response.json()
+          setCurrentUserId(data.id)
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error)
+      }
+    }
+
+    if (session) {
+      fetchCurrentUser()
+    }
+  }, [session])
+
+  useEffect(() => {
     fetchRooms()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate])
+
+  const handleRandomSeat = async () => {
+    if (!currentUserId) {
+      alert("Please log in to make a reservation")
+      router.push("/consent")
+      return
+    }
+
+    setRandomLoading(true)
+    try {
+      const response = await fetch("/api/seats/random", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: currentUserId,
+          date: selectedDate,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        alert(`Reserved seat ${data.seat_id} in ${data.room_name}!`)
+        router.push(`/rooms/${data.room_id}`)
+      } else {
+        const error = await response.json()
+        alert(error.error || "Failed to reserve random seat")
+      }
+    } catch {
+      alert("Error reserving random seat")
+    } finally {
+      setRandomLoading(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -49,14 +108,23 @@ export default function RoomsPage() {
   return (
     <div className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
           <h1 className="text-3xl font-bold">Available Rooms</h1>
-          <Link
-            href="/"
-            className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-          >
-            ← Back to Home
-          </Link>
+          <div className="flex gap-3">
+            <button
+              onClick={handleRandomSeat}
+              disabled={randomLoading}
+              className="px-6 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {randomLoading ? "Finding..." : "🎲 Random Seat"}
+            </button>
+            <Link
+              href="/"
+              className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+            >
+              ← Back to Home
+            </Link>
+          </div>
         </div>
 
         {/* Date selector */}
